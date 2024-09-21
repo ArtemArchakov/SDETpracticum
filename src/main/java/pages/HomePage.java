@@ -7,7 +7,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import utils.Wait;
-
 import java.time.Duration;
 
 public class HomePage {
@@ -15,7 +14,7 @@ public class HomePage {
     private WebElement addCustomerButton;
     private WebElement customersButton;
 
-    public HomePage(WebDriver driver) throws InterruptedException {
+    public HomePage(WebDriver driver) {
         this.driver = driver;
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("button.btn.btn-lg.tab")));

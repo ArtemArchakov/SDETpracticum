@@ -6,7 +6,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import utils.Wait;
 
 import java.time.Duration;
 import java.util.HashSet;
@@ -18,7 +17,7 @@ public class CustomersPage {
     WebDriver driver;
     WebElement firstNameSortButton;
 
-    public CustomersPage(WebDriver driver) throws InterruptedException {
+    public CustomersPage(WebDriver driver) {
         this.driver = driver;
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//tbody/tr")));
