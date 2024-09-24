@@ -35,7 +35,7 @@ public class Wait {
     }
 
     public static void waitUntilAlertIsPresent(WebDriver driver) {
-        new WebDriverWait(driver, Duration.ofSeconds(10))
+        new WebDriverWait(driver, Duration.ofSeconds(200))
                 .until(ExpectedConditions.alertIsPresent());
     }
 

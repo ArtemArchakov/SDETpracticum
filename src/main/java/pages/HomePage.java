@@ -4,10 +4,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import utils.Wait;
-import java.time.Duration;
+
 
 public class HomePage {
     private WebDriver driver;
@@ -16,12 +14,13 @@ public class HomePage {
 
     public HomePage(WebDriver driver) {
         this.driver = driver;
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("button.btn.btn-lg.tab")));
-        addCustomerButton = driver.findElement(By.cssSelector("button.btn.btn-lg.tab"));
 
         Wait.waitUntilVisible(driver, By.xpath("//button[contains(text(), 'Customers')]"), 20);
         customersButton = driver.findElement(By.xpath("//button[contains(text(), 'Customers')]"));
+        addCustomerButton = driver.findElement(By.xpath("//button[contains(text(), 'Add Customer')]"));
+        driver.findElement(By.xpath("//button[contains(text(), 'Home')]"));
+        driver.findElement(By.xpath("//button[contains(text(), 'Open Account')]"));
+        driver.findElement(By.xpath("//strong[contains(text(), 'XYZ Bank')]"));
     }
 
     public void clickAddCustomer() {

@@ -12,12 +12,12 @@ public class PropertyProvider {
 
     private PropertyProvider() {
         properties = new Properties();
-        try (InputStream input = getClass().getClassLoader().getResourceAsStream("config.properties")) {
-            if (input == null) {
+        try (InputStream configStream = getClass().getClassLoader().getResourceAsStream("config.properties")) {
+            if (configStream == null) {
                 System.err.println("config.properties not found in classpath");
                 throw new FileNotFoundException("config.properties not found in classpath");
             }
-            properties.load(input);
+            properties.load(configStream);
             System.out.println("config.properties successfully loaded.");
         } catch (IOException e) {
             e.printStackTrace();

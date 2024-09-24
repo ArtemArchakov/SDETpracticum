@@ -23,4 +23,8 @@ public class TestDataGenerator {
         }
         return name.toString();
     }
+
+    public static String fixLastName() {
+        return "TestLastName";
+    }
 }

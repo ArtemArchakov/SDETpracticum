@@ -2,7 +2,6 @@ import io.qameta.allure.*;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import pages.CustomersPage;
-import java.util.List;
 
 @Epic("Управление клиентами")
 @Feature("Сортировка клиентов")
@@ -18,22 +17,12 @@ public class SortCustomersTest extends BaseTest {
     }
 
     @Test(description = "Проверка сортировки клиентов по имени в алфавитном порядке")
-    @Description("Тест сортирует список клиентов по их именам в алфавитном порядке и проверяет результат сортировки.")
+    @Description("Тест сортирует список клиентов и выводит результат сортировки.")
     @Severity(SeverityLevel.NORMAL)
     public void sortCustomersByNameTest() {
-        sortCustomerNames();
-        verifySorting();
-    }
-
-    @Step("Сортировка имен клиентов по алфавиту")
-    public void sortCustomerNames() {
         customersPage.sortCustomersByName();
+        customersPage.resultSorting();
     }
 
-    @Step("Проверка сортировки имен клиентов в алфавитном порядке")
-    public void verifySorting() {
-        List<String> customerNames = customersPage.getCustomerNames();
-        String customerNamesStr = String.join(", ", customerNames);
-        Allure.addAttachment("Имена клиентов после сортировки: ", customerNamesStr);
-    }
+
 }

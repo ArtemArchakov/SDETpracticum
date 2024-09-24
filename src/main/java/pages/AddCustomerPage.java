@@ -1,8 +1,11 @@
 package pages;
 
+import io.qameta.allure.Allure;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
+import utils.Wait;
 import java.time.Duration;
 
 public class AddCustomerPage {
@@ -17,7 +20,6 @@ public class AddCustomerPage {
     public AddCustomerPage(WebDriver driver) throws InterruptedException {
         this.driver = driver;
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        //WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("input[placeholder='First Name']")));
         firstNameField = driver.findElement(By.cssSelector("input[placeholder='First Name']"));
@@ -30,10 +32,18 @@ public class AddCustomerPage {
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("button[type='submit'].btn.btn-default")));
         addCustomerButton = driver.findElement(By.cssSelector("button[type='submit'].btn.btn-default"));
-    }
 
+        String firstNamePlaceholder = firstNameField.getAttribute("placeholder");
+        Assert.assertEquals(firstNamePlaceholder, "First Name", "Плейсхолдер поля 'First Name' не соответствует ожидаемому значению.");
+
+        String lastNamePlaceholder = lastNameField.getAttribute("placeholder");
+        Assert.assertEquals(lastNamePlaceholder, "Last Name", "Плейсхолдер поля 'Last Name' не соответствует ожидаемому значению.");
+
+        String postCodePlaceholder = postCodeField.getAttribute("placeholder");
+        Assert.assertEquals(postCodePlaceholder, "Post Code", "Плейсхолдер поля 'Post Code' не соответствует ожидаемому значению.");
+
+    }
     public void enterFirstName(String firstName) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         wait.until(ExpectedConditions.visibilityOf(firstNameField));
         firstNameField.click();
         firstNameField.sendKeys(firstName);
@@ -41,7 +51,6 @@ public class AddCustomerPage {
     }
 
     public void enterLastName(String lastName) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         wait.until(ExpectedConditions.visibilityOf(lastNameField));
         lastNameField.click();
         lastNameField.sendKeys(lastName);
@@ -49,7 +58,6 @@ public class AddCustomerPage {
     }
 
     public void enterPostCode(String postCode) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         wait.until(ExpectedConditions.visibilityOf(postCodeField));
         postCodeField.click();
         postCodeField.sendKeys(postCode);
@@ -57,7 +65,6 @@ public class AddCustomerPage {
     }
 
     public void submit() {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         wait.until(ExpectedConditions.elementToBeClickable(addCustomerButton));
 
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", addCustomerButton);
@@ -66,6 +73,21 @@ public class AddCustomerPage {
 
     public WebElement getFirstNameField() {
         return firstNameField;
+    }
+    public void enterCustomerDetails(String firstName, String lastName, String postCode) {
+        Wait.waitUntilVisible(driver, getFirstNameField());
+        enterFirstName(firstName);
+
+        Wait.waitUntilVisible(driver, getLastNameField());
+        enterLastName(lastName);
+
+        Wait.waitUntilVisible(driver, getPostCodeField());
+        enterPostCode(postCode);
+
+        Allure.addAttachment("Введенные данные клиента",
+                "Имя: " + firstName + "\n" +
+                        "Фамилия: " + lastName + "\n" +
+                        "Почтовый код: " + postCode);
     }
 
     public WebElement getLastNameField() {
@@ -78,5 +100,17 @@ public class AddCustomerPage {
 
     public WebElement getSubmitButton() {
         return addCustomerButton;
+    }
+
+    public void clearFirstName() {
+        firstNameField.clear();
+    }
+
+    public void clearLastName() {
+        lastNameField.clear();
+    }
+
+    public void clearPostCode() {
+        postCodeField.clear();
     }
 }

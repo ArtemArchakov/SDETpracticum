@@ -1,4 +1,5 @@
 import io.qameta.allure.*;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import pages.CustomersPage;
@@ -29,27 +30,12 @@ public class DeleteCustomerTest extends BaseTest {
             return;
         }
 
-        logCustomerNameLengths(customerNames);
+        customersPage.logCustomerNameLengths(customerNames);
         String closestName = findCustomerNameClosestToAverage(customerNames);
         deleteCustomer(closestName);
+        Assert.assertFalse(customersPage.isCustomerPresent(closestName), "Клиент все еще существует после удаления!");
     }
 
-    @Step("Логирование длины каждого имени и средней длины имен")
-    public void logCustomerNameLengths(List<String> customerNames) {
-        System.out.println("Длины имен клиентов:");
-        customerNames.forEach(name -> System.out.println("Имя: " + name + ", Длина: " + name.length()));
-
-        OptionalDouble averageLength = customerNames.stream()
-                .mapToInt(String::length)
-                .average();
-
-        if (averageLength.isPresent()) {
-            System.out.println("Средняя длина имен клиентов: " + averageLength.getAsDouble());
-            Allure.addAttachment("Средняя длина имен клиентов", String.valueOf(averageLength.getAsDouble()));
-        } else {
-            System.out.println("Не удалось вычислить среднюю длину имен клиентов.");
-        }
-    }
 
     @Step("Поиск имени клиента, ближайшего к средней длине")
     public String findCustomerNameClosestToAverage(List<String> customerNames) {
