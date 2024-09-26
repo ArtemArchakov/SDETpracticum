@@ -9,46 +9,76 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 public class CustomersPage {
     WebDriver driver;
     WebElement firstNameSortButton;
-    private long finalLastHeight;
+    WebElement lastNameSortButton;
+    WebElement postCodeSortButton;
+    WebElement tableContainer;
+    WebElement searchCustomerField;
+    List<WebElement> tableRows;
 
     public CustomersPage(WebDriver driver) {
         this.driver = driver;
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//tbody/tr")));
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div.marTop")));
+        tableContainer = driver.findElement(By.cssSelector("div.marTop"));
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(), 'First Name')]")));
         firstNameSortButton = driver.findElement(By.xpath("//a[contains(text(), 'First Name')]"));
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(), 'Last Name')]")));
+        lastNameSortButton = driver.findElement(By.xpath("//a[contains(text(), 'Last Name')]"));
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(), 'Post Code')]")));
+        postCodeSortButton = driver.findElement(By.xpath("//a[contains(text(), 'Post Code')]"));
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//tbody/tr")));
+        tableRows = driver.findElements(By.xpath("//tbody/tr"));
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("input[placeholder='Search Customer']")));
+        searchCustomerField = driver.findElement(By.cssSelector("input[placeholder='Search Customer']"));
+
     }
 
     public List<String> getCustomerNames() {
         Set<String> customerNames = new HashSet<>();
         JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-
-
         WebElement container = driver.findElement(By.cssSelector("div.marTop"));
 
-        long lastHeight = (long) jsExecutor.executeScript("return arguments[0].scrollHeight", container);
+        AtomicLong lastHeight = new AtomicLong((long) jsExecutor.executeScript("return arguments[0].scrollHeight", container));
+        AtomicInteger attempts = new AtomicInteger(0);
 
-        while (true) {
+        while (attempts.get() < 3) { // Ограничиваем цикл до 3 неудачных попыток
             List<WebElement> nameElements = driver.findElements(By.xpath("//tbody/tr/td[1]"));
+            int previousSize = customerNames.size();
             customerNames.addAll(nameElements.stream().map(WebElement::getText).collect(Collectors.toSet()));
 
             jsExecutor.executeScript("arguments[0].scrollTop = arguments[0].scrollHeight", container);
 
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            wait.until((ExpectedCondition<Boolean>) wd -> {
-                long newHeight = (long) jsExecutor.executeScript("return arguments[0].scrollHeight", container);
-                return newHeight > finalLastHeight || driver.findElements(By.xpath("//tbody/tr/td[1]")).size() > customerNames.size();
-            });
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+            try {
+                wait.until((ExpectedCondition<Boolean>) wd -> {
+                    long newHeight = (long) jsExecutor.executeScript("return arguments[0].scrollHeight", container);
+                    return newHeight > lastHeight.get() || driver.findElements(By.xpath("//tbody/tr/td[1]")).size() > previousSize;
+                });
 
-            long newHeight = (long) jsExecutor.executeScript("return arguments[0].scrollHeight", container);
-            if (newHeight == lastHeight) {
+                long newHeight = (long) jsExecutor.executeScript("return arguments[0].scrollHeight", container);
+                if (newHeight == lastHeight.get()) {
+                    attempts.incrementAndGet(); // Увеличиваем счетчик попыток
+                } else {
+                    attempts.set(0); // Сбрасываем счетчик попыток при изменении высоты
+                    lastHeight.set(newHeight);
+                }
+            } catch (TimeoutException e) {
+                System.out.println("Время ожидания истекло: прокрутка не увеличила высоту.");
                 break;
             }
-            lastHeight = newHeight;
         }
 
         return new ArrayList<>(customerNames);
@@ -64,11 +94,6 @@ public class CustomersPage {
         Allure.addAttachment("Имена клиентов после сортировки: ", customerNamesStr);
     }
 
-    public void deleteCustomerByName(String name) {
-        By deleteButton = By.xpath("//td[text()='" + name + "']/following-sibling::td/button");
-        driver.findElement(deleteButton).click();
-    }
-
     public boolean isCustomerPresent(String customerName) {
         try {
             driver.findElement(By.xpath("//td[text()='" + customerName + "']"));
@@ -77,6 +102,19 @@ public class CustomersPage {
             return false;
         }
     }
+
+    public void deleteCustomer(String customerName) {
+        try {
+            By deleteButton = By.xpath("//td[text()='" + customerName + "']/following-sibling::td/button");
+            driver.findElement(deleteButton).click();
+            System.out.println("Клиент с именем удален: " + customerName);
+        } catch (NoSuchElementException e) {
+            System.err.println("Не удалось найти клиента с именем: " + customerName);
+        } catch (Exception e) {
+            System.err.println("Не удалось удалить клиента: " + e.getMessage());
+        }
+    }
+
 
     public void logCustomerNameLengths(List<String> customerNames) {
         System.out.println("Длины имен клиентов:");
@@ -92,5 +130,16 @@ public class CustomersPage {
         } else {
             System.out.println("Не удалось вычислить среднюю длину имен клиентов.");
         }
+    }
+
+    public String findCustomerNameClosestToAverage(List<String> customerNames) {
+        OptionalDouble averageLength = customerNames.stream().mapToInt(String::length).average();
+
+        return customerNames.stream()
+                .min((name1, name2) -> {
+                    double diff1 = Math.abs(name1.length() - averageLength.orElse(0));
+                    double diff2 = Math.abs(name2.length() - averageLength.orElse(0));
+                    return Double.compare(diff1, diff2);
+                }).orElse(null);
     }
 }

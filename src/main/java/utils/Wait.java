@@ -1,6 +1,7 @@
 package utils;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -35,13 +36,19 @@ public class Wait {
     }
 
     public static void waitUntilAlertIsPresent(WebDriver driver) {
-        new WebDriverWait(driver, Duration.ofSeconds(200))
-                .until(ExpectedConditions.alertIsPresent());
+        getInstance(driver).wait.until(ExpectedConditions.alertIsPresent());
     }
 
     public static void waitUntilVisible(WebDriver driver, By locator, int timeoutInSeconds) {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutInSeconds));
         wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
     }
+
+    public static void waitUntilElementIsVisible(WebDriver driver, By locator) {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait.ignoring(StaleElementReferenceException.class)
+                .until(ExpectedConditions.visibilityOfElementLocated(locator));
+    }
+
 
 }

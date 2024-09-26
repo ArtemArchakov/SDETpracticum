@@ -23,6 +23,4 @@ public class SortCustomersTest extends BaseTest {
         customersPage.sortCustomersByName();
         customersPage.resultSorting();
     }
-
-
 }

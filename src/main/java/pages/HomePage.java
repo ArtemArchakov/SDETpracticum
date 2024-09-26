@@ -54,6 +54,4 @@ public class HomePage {
             System.err.println("Ошибка при попытке кликнуть на кнопку 'Customers': " + e.getMessage());
         }
     }
-
-
 }
