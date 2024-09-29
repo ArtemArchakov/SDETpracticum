@@ -1,6 +1,7 @@
 package utils;
 
 public class TestDataGenerator {
+    private static String generatedFirstName;
 
     public static String generatePostCode() {
         return String.valueOf((long) (Math.random() * 1_000_000_0000L));
@@ -19,10 +20,15 @@ public class TestDataGenerator {
                 name.append(letter);
             }
         }
-        return name.toString();
+        generatedFirstName = name.toString();
+        return generatedFirstName;
     }
 
-    public static String fixLastName() {
+    public static String lastName() {
         return "TestLastName";
+    }
+
+    public static String getGeneratedFirstName() {
+        return generatedFirstName;
     }
 }

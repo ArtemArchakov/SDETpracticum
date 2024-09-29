@@ -7,7 +7,7 @@ import pages.CustomersPage;
 @Feature("Сортировка клиентов")
 public class SortCustomersTest extends BaseTest {
 
-    CustomersPage customersPage;
+    private CustomersPage customersPage;
 
     @BeforeClass
     public void setUp() throws InterruptedException {

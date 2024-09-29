@@ -1,4 +1,5 @@
 import io.github.bonigarcia.wdm.WebDriverManager;
+import org.openqa.selenium.UnexpectedAlertBehaviour;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -8,8 +9,8 @@ import pages.HomePage;
 import utils.Constants;
 
 public class BaseTest {
-    public ThreadLocal<WebDriver> driver = new ThreadLocal<>();
-    public HomePage homePage;
+    private final ThreadLocal<WebDriver> driver = new ThreadLocal<>();
+    protected HomePage homePage;
 
     @BeforeClass
     public void setUp() throws InterruptedException {
@@ -19,16 +20,15 @@ public class BaseTest {
         options.addArguments("--disable-blink-features=AutomationControlled")
                 .addArguments("--remote-allow-origins=*")
                 .addArguments("--disable-dev-shm-usage")
-                .addArguments("--no-sandbox");
+                .addArguments("--no-sandbox")
+                .setUnhandledPromptBehaviour(UnexpectedAlertBehaviour.ACCEPT);
+        driver.set(new ChromeDriver(options));
 
-        WebDriver chromeDriver = new ChromeDriver(options);
-        driver.set(chromeDriver);
+        getDriver().manage().window().maximize();
+        getDriver().manage().deleteAllCookies();
 
-        driver.get().manage().window().maximize();
-        driver.get().manage().deleteAllCookies();
-
-        driver.get().get(Constants.BASE_URL);
-        homePage = new HomePage(driver.get());
+        getDriver().get(Constants.BASE_URL);
+        homePage = new HomePage(getDriver());
     }
 
     public WebDriver getDriver() {
@@ -37,9 +37,9 @@ public class BaseTest {
 
     @AfterClass(alwaysRun = true)
     public void tearDown() {
-        if (driver.get() != null) {
+        if (getDriver() != null) {
             try {
-                driver.get().quit();
+                getDriver().quit();
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {

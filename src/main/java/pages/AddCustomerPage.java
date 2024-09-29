@@ -6,10 +6,12 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import utils.Constants;
+import utils.TestDataGenerator;
 import utils.Wait;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class AddCustomerPage {
     private final WebDriverWait wait;
@@ -82,7 +84,7 @@ public class AddCustomerPage {
         By postCodeFieldLocator = By.xpath("//input[@ng-model='postCd']");
         Wait.waitUntilElementIsVisible(driver, postCodeFieldLocator);
 
-        WebElement postCodeField = driver.findElement(postCodeFieldLocator); // Повторно находим элемент после ожидания
+        WebElement postCodeField = driver.findElement(postCodeFieldLocator);
         postCodeField.click();
         postCodeField.sendKeys(postCode);
         System.out.println("Entered Post Code: " + postCode);
@@ -92,7 +94,7 @@ public class AddCustomerPage {
         By addCustomerButtonLocator = By.cssSelector("button[ng-click='addCustomer()']");
         Wait.waitUntilElementIsVisible(driver, addCustomerButtonLocator);
 
-        WebElement addCustomerButton = driver.findElement(addCustomerButtonLocator); // Повторно находим элемент после ожидания
+        WebElement addCustomerButton = driver.findElement(addCustomerButtonLocator);
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", addCustomerButton);
         System.out.println("Clicked 'Add Customer' button using JavascriptExecutor");
     }
@@ -155,28 +157,30 @@ public class AddCustomerPage {
             try {
                 WebElement field = wait.until(ExpectedConditions.visibilityOfElementLocated(selector));
 
-                if (!field.getAttribute("value").isEmpty()) {
+                if (!Objects.requireNonNull(field.getAttribute("value")).isEmpty()) {
                     field.clear();
                 }
             } catch (StaleElementReferenceException e) {
-                // Обработка ситуации, когда элемент становится "устаревшим" из-за изменения структуры DOM
                 handleStaleElement(selector);
             } catch (TimeoutException e) {
                 System.out.println("Элемент не найден в течение указанного времени: " + selector);
             }
         }
     }
-    // Вспомогательный метод для обработки StaleElementReferenceException
+
     private void handleStaleElement(By selector) {
-        // Повторное нахождение элемента после возникновения StaleElementReferenceException
         WebElement field = driver.findElement(selector);
-
-        // Используем явное ожидание для повторного ожидания видимости элемента
         Wait.waitUntilElementIsVisible(driver, selector);
-
-        // Проверяем, если в поле есть значение, очищаем его
-        if (!field.getAttribute("value").isEmpty()) {
+        if (!Objects.requireNonNull(field.getAttribute("value")).isEmpty()) {
             field.clear();
         }
+    }
+
+    public void addCustomerWithData() {
+        String postCode = TestDataGenerator.generatePostCode();
+        String firstName = TestDataGenerator.generateFirstName(postCode);
+        String lastName = TestDataGenerator.lastName();
+        enterCustomerDetails(firstName, lastName, postCode);
+        submitForm();
     }
 }

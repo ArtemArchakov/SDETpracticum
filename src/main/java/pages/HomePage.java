@@ -8,9 +8,9 @@ import utils.Wait;
 
 
 public class HomePage {
-    private WebDriver driver;
-    private WebElement addCustomerButton;
-    private WebElement customersButton;
+    private final WebDriver driver;
+    private final WebElement addCustomerButton;
+    private final WebElement customersButton;
 
     public HomePage(WebDriver driver) {
         this.driver = driver;

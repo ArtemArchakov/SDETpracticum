@@ -43,7 +43,6 @@ public class CustomersPage {
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("input[placeholder='Search Customer']")));
         searchCustomerField = driver.findElement(By.cssSelector("input[placeholder='Search Customer']"));
-
     }
 
     public List<String> getCustomerNames() {
@@ -102,19 +101,6 @@ public class CustomersPage {
             return false;
         }
     }
-
-    public void deleteCustomer(String customerName) {
-        try {
-            By deleteButton = By.xpath("//td[text()='" + customerName + "']/following-sibling::td/button");
-            driver.findElement(deleteButton).click();
-            System.out.println("Клиент с именем удален: " + customerName);
-        } catch (NoSuchElementException e) {
-            System.err.println("Не удалось найти клиента с именем: " + customerName);
-        } catch (Exception e) {
-            System.err.println("Не удалось удалить клиента: " + e.getMessage());
-        }
-    }
-
 
     public void logCustomerNameLengths(List<String> customerNames) {
         System.out.println("Длины имен клиентов:");

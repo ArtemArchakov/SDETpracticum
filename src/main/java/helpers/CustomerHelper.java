@@ -6,15 +6,15 @@ import pages.CustomersPage;
 import java.util.List;
 
 public class CustomerHelper {
-    private WebDriver driver;
-    private CustomersPage customersPage;
+    private final WebDriver driver;
+    private final CustomersPage customersPage;
 
     public CustomerHelper(WebDriver driver) {
         this.driver = driver;
-        customersPage = new CustomersPage(driver);
+        this.customersPage = new CustomersPage(driver);
     }
 
-    public void deleteAddCustomer(String firstName) {
+    public void deleteCustomer(String firstName) {
         List<String> customerNames = customersPage.getCustomerNames();
 
         if (customerNames.isEmpty()) {
@@ -24,8 +24,7 @@ public class CustomerHelper {
                 By deleteButton = By.xpath("//td[text()='" + firstName + "']/following-sibling::td/button");
                 driver.findElement(deleteButton).click();
                 System.out.println("Клиент с именем удален: " + firstName);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 System.err.println("Не удалось удалить клиента: " + e.getMessage());
             }
         }

@@ -2,25 +2,28 @@ import helpers.CustomerHelper;
 import io.qameta.allure.*;
 import org.testng.annotations.*;
 import pages.AddCustomerPage;
-import utils.TestDataGenerator;
+import static utils.TestDataGenerator.*;
 
 @Epic("Управление клиентами")
 @Feature("Добавление клиента")
 public class AddCustomerTest extends BaseTest {
 
-    AddCustomerPage addCustomerPage;
+    private AddCustomerPage addCustomerPage;
+    private CustomerHelper customerHelper;
 
     @BeforeClass
     public void setUp() throws InterruptedException {
         super.setUp();
         homePage.clickAddCustomer();
         addCustomerPage = new AddCustomerPage(getDriver());
-    }
-    @BeforeMethod
-    public void clearFieldsBeforeEachTest() {
-        addCustomerPage.clearInputFields();
+        homePage.clickCustomers();
+        customerHelper = new CustomerHelper(getDriver());
     }
 
+    @BeforeMethod
+    public void clearFields() {
+        addCustomerPage.clearInputFields();
+    }
 
     @Test(description = "Негативный тест: попытка добавить клиента с полностью пустыми полями")
     @Description("Тест проверяет, что форма не позволяет добавить клиента, если все поля пустые.")
@@ -91,15 +94,7 @@ public class AddCustomerTest extends BaseTest {
     @Description("Тест проверяет возможность добавления нового клиента и подтверждает успешное добавление через сообщение в алерте.")
     @Severity(SeverityLevel.CRITICAL)
     public void addCustomerTest() {
-        String postCode = TestDataGenerator.generatePostCode();
-        String firstName = TestDataGenerator.generateFirstName(postCode);
-        String lastName = TestDataGenerator.fixLastName();
-
-        addCustomerPage.enterCustomerDetails(firstName,lastName,postCode);
-        addCustomerPage.submitForm();
-        addCustomerPage.handleAlert();
-        homePage.clickCustomers();
-        CustomerHelper customerHelper = new CustomerHelper(getDriver());
-        customerHelper.deleteAddCustomer(firstName);
+        addCustomerPage.addCustomerWithData();
+        customerHelper.deleteCustomer(getGeneratedFirstName());
     }
 }
