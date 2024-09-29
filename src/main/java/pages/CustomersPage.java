@@ -14,35 +14,30 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 public class CustomersPage {
-    WebDriver driver;
-    WebElement firstNameSortButton;
-    WebElement lastNameSortButton;
-    WebElement postCodeSortButton;
-    WebElement tableContainer;
-    WebElement searchCustomerField;
-    List<WebElement> tableRows;
+    private final WebDriver driver;
+    private final WebElement firstNameSortButton;
 
     public CustomersPage(WebDriver driver) {
         this.driver = driver;
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div.marTop")));
-        tableContainer = driver.findElement(By.cssSelector("div.marTop"));
+        WebElement tableContainer = driver.findElement(By.cssSelector("div.marTop"));
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(), 'First Name')]")));
         firstNameSortButton = driver.findElement(By.xpath("//a[contains(text(), 'First Name')]"));
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(), 'Last Name')]")));
-        lastNameSortButton = driver.findElement(By.xpath("//a[contains(text(), 'Last Name')]"));
+        WebElement lastNameSortButton = driver.findElement(By.xpath("//a[contains(text(), 'Last Name')]"));
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(), 'Post Code')]")));
-        postCodeSortButton = driver.findElement(By.xpath("//a[contains(text(), 'Post Code')]"));
+        WebElement postCodeSortButton = driver.findElement(By.xpath("//a[contains(text(), 'Post Code')]"));
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//tbody/tr")));
-        tableRows = driver.findElements(By.xpath("//tbody/tr"));
+        List<WebElement> tableRows = driver.findElements(By.xpath("//tbody/tr"));
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("input[placeholder='Search Customer']")));
-        searchCustomerField = driver.findElement(By.cssSelector("input[placeholder='Search Customer']"));
+        WebElement searchCustomerField = driver.findElement(By.cssSelector("input[placeholder='Search Customer']"));
     }
 
     public List<String> getCustomerNames() {

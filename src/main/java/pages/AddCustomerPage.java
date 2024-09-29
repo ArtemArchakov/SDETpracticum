@@ -15,7 +15,7 @@ import java.util.Objects;
 
 public class AddCustomerPage {
     private final WebDriverWait wait;
-    WebDriver driver;
+    private final WebDriver driver;
     private WebElement firstNameField;
     private WebElement lastNameField;
     private WebElement postCodeField;
